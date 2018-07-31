@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Module dependencies.
  */
@@ -21,6 +22,10 @@ const sass = require('node-sass-middleware');
 const multer = require('multer');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.dev.config');
+
+const compiler = webpack(webpackConfig);
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -82,6 +87,11 @@ app.use(session({
     autoReconnect: true,
   })
 }));
+app.use(require('webpack-dev-middleware')(compiler, {
+  noInfo: true, publicPath: webpackConfig.output.publicPath
+}));
+app.use(require('webpack-hot-middleware')(compiler));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -101,14 +111,11 @@ app.use((req, res, next) => {
 });
 app.use((req, res, next) => {
   // After successful login, redirect back to the intended page
-  if (!req.user &&
-    req.path !== '/login' &&
-    req.path !== '/signup' &&
-    !req.path.match(/^\/auth/) &&
-    !req.path.match(/\./)) {
+  if (!req.user && req.path
+    !== '/login' && req.path !== '/signup'
+    && !req.path.match(/^\/auth/) && !req.path.match(/\./)) {
     req.session.returnTo = req.originalUrl;
-  } else if (req.user &&
-    (req.path === '/account' || req.path.match(/^\/api/))) {
+  } else if (req.user && (req.path === '/account' || req.path.match(/^\/api/))) {
     req.session.returnTo = req.originalUrl;
   }
   next();
