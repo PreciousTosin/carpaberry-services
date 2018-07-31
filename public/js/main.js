@@ -1,5 +1,7 @@
+const $ = require('jquery');
+
 $(document).ready(() => {
 
-  // Place JavaScript code here...
+  console.log('Place JavaScript code here...');
 
 });
