@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  #sidenav.side--nav
+    .menu--header
+      .avatar
+        img(src='./assets/images/profile.jpg', alt='avatar')
+      .username
+        | Akinbobola
+    .menu--body
+      .home--tab
+        .icon--block
+          img(src='./assets/images/side-menu/ic-home.svg', alt='home')
+        .tab-text
+          | Home
+      .request--tab
+        .icon--block
+          img(src='./assets/images/side-menu/ic-request.svg', alt='request')
+        .tab-text
+          | Request Pickup
+      .login--tab
+        .icon--block
+          img(src='./assets/images/side-menu/ic-login.svg', alt='login')
+        .tab-text
+          | Log In
+      .prices--tab
+        .icon--block
+          img(src='./assets/images/side-menu/ic-prices.svg', alt='prices')
+        .tab-text
+          | Prices
+      .contact--tab
+        .contact--block
+          img(src='./assets/images/side-menu/ic-contact.svg', alt='contact')
+        .tab-text
+          | Contact
