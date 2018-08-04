@@ -9,7 +9,7 @@ COPY package.json /carpaberry/package.json
 RUN npm install
 #RUN npm install --production
 
-COPY .env.example /carpaberry/.env.example
+COPY .env /carpaberry/.env.example
 COPY . /carpaberry
 
 CMD ["npm","start"]
