@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/scss/fa-brands.scss';
 import '@fortawesome/fontawesome-free/scss/fa-regular.scss';
 import '@fortawesome/fontawesome-free/scss/fa-solid.scss';
 import '../public/css/main.scss';
+import '../public/css/main-style.css';
 
 const $ = require('jquery');
 
