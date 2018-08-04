@@ -1,0 +1,23 @@
+
+/* Font-face */
+@font-face { font-family: ProximaNovaSoft-Regular; src: url('fonts/proxima-nova-soft/ProximaNovaSoft-Regular.otf') format("opentype"); }
+@font-face { font-family: ProximaNovaSoft-Medium; src: url('fonts/proxima-nova-soft/ProximaNovaSoft-Medium.otf') format("opentype"); }
+@font-face { font-family: ProximaNovaSoft-Semibold; src: url('fonts/proxima-nova-soft/ProximaNovaSoft-Semibold.otf') format("opentype"); }
+@font-face { font-family: ProximaNovaSoft-Bold; src: url('fonts/proxima-nova-soft/ProximaNovaSoft-Bold.otf') format("opentype"); }
+
+
+.nav--item {
+  font-family: ProximaNovaSoft-Regular;
+}
+
+.menu--header {
+  background-image: url("../images/side-menu/menu-header-bg.png");
+}
+
+.username {
+  font-family: ProximaNovaSoft-Regular;
+}
+
+.tab-text {
+  font-family: ProximaNovaSoft-Regular;
+}

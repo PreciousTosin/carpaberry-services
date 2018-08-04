@@ -1,6 +1,6 @@
 @import "themes/default/variables";
 
-@import "node_modules/bootstrap/scss/bootstrap";
+//@import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/@ladjs/bootstrap-social/bootstrap-social.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 //@import "node_modules/@fortawesome/fontawesome-free/scss/fa-brands";
@@ -8,6 +8,25 @@
 //@import "node_modules/@fortawesome/fontawesome-free/scss/fa-solid";
 
 @import "themes/default/default";
+
+@mixin font-face($family,$src,$style: normal,$weight: normal) {
+  @font-face {
+    font-family: $family;
+    src: url('#{$src}.eot'); // IE9 compat
+    src: url('#{$src}.eot?#iefix') format('embedded-opentype'), // IE8 and below
+    //url('#{$src}.woff') format('woff'), // standards
+    //url('#{$src}.ttf') format('truetype'), // Safari, Android, iOS
+    url('#{$src}.svg##{$family}') format('svg'); // legacy iOS
+
+    font-style: $style;
+    font-weight: $weight;
+  }
+}
+
+//@include font-face(ProximaNovaSoft-Regular, '~/../public/css/fonts/proxima-nova-soft/ProximaNovaSoft-Regular');
+//@include font-face(ProximaNovaSoft-Medium, '~/../public/css/fonts/proxima-nova-soft/ProximaNovaSoft-Medium');
+//@include font-face(ProximaNovaSoft-Semibold, '~/../public/css/fonts/proxima-nova-soft/ProximaNovaSoft-Semibold');
+//@include font-face(ProximaNovaSoft-Bold, '~/../public/css/fonts/proxima-nova-soft/ProximaNovaSoft-Bold');
 
 // Scaffolding
 // -------------------------
@@ -18,9 +37,9 @@ html {
 }
 
 body {
-  padding-top: 80px;
   margin-bottom: 75px;
-  font-size: 14px;
+  font-size: 1rem;
+  background-color: #FFFFFF;
 }
 
 footer {
@@ -35,6 +54,16 @@ footer {
   }
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+header, nav, footer, section, article, div {
+  box-sizing: border-box;
+}
+
 // Input Fields
 // -------------------------
 
@@ -45,7 +74,172 @@ textarea {
 // Navbar
 // -------------------------
 
-.navbar-nav img {
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  height: 56px;
+  position: absolute;
+  padding: .5rem 1rem;
+  color: #FFFFFF;
+  background-color: #78439F;
+}
+
+.nav--brand {
+  height: 30px;
+  width: 30px;
+}
+
+.nav--list {
+  display: flex;
+  /*margin-left: auto;
+  margin-right: auto;*/
+}
+
+.nav--item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  line-height: 100%;
+  padding: 0.5rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.nav a:hover {
+
+}
+
+.nav--list.disable--list {
+  display: none;
+}
+
+.nav.shift--brand {
+  justify-content: flex-end;
+}
+
+.collapsible {
+  display: none;
+}
+
+.deskt--brand {
+  display: none;
+}
+
+.mobile--nav {
+  font-size: 20px;
+  margin: 0 auto;
+}
+
+.dropdown-toggle {
+  height: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-toggle img {
+  height: 100%;
+  /*width: 100%;*/
+}
+
+.dropdown-toggle span {
+  padding-left: 0.2rem;
+}
+
+.dropdown-menu a {
+  color: #212529;
+}
+
+.account--management {
+  display: none;
+}
+
+/* Side NavBar */
+
+.side--nav.open {
+  transform:translateX(0);
+  transition: transform 0.5s ease;
+}
+
+.side--nav {
+  height: 721px;
+  width: 294px;
+  background-color: #FFFFFF;
+  position: absolute;
+  z-index: 10;
+  transform: translateX(-320px);
+  transition: transform 0.5s ease;
+}
+
+.menu--header {
+  display: flex;
+  padding-top: 5rem;
+  padding-left: 1.5rem;
+  height: 153px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+}
+
+.avatar img {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+
+.username {
+  display: flex;
+  align-items: center;
+  font-family: ProximaNovaSoft-Regular;
+  font-size: 18px;
+  color: #FFFFFF;
+  height: 50px;
+  line-height: 100%;
+  padding-left: 0.5rem;
+}
+
+.menu--body > div {
+  display: flex;
+  height: 55px;
+  padding: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.menu--body > div:hover {
+  background-color: #F7F0FC;
+}
+
+.icon--block {
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  color: #8D52BA;
+}
+
+.icon--block img {
+  width: 100%;
+  height:100%;
+}
+
+.tab-text {
+  font-size: 16px;
+  color: #8D52BA;
+  line-height: 100%;
+  padding-left: 0.5rem;
+  padding-top: 0.2rem;
+}
+
+
+/*.navbar-nav img {
   width: 30px;
   min-height: 30px;
   margin: -15px 15px -15px;
@@ -73,7 +267,7 @@ textarea {
 
 .navbar-toggler-icon {
   font-size: 16px;
-}
+}*/
 
 .dropdown-menu {
   left: initial;
@@ -113,4 +307,85 @@ textarea {
 
 .far {
   margin-right: 6px;
+}
+
+.layout--container {
+  padding-top: 56px;
+}
+
+.home--container {
+
+}
+
+.banner--container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 180px;
+  background-color: #BA74F1;
+  text-align: center;
+  padding-top: 1em;
+}
+
+.request--button {
+  justify-content: center;
+}
+
+.request--button button {
+  border-radius: 0.2rem;
+  background-color: #78439F;
+  color: #FFFFFF;
+  border-color: #78439F;
+}
+
+.banner--text {
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  font-family: ProximaNovaSoft-Regular;
+  font-size: 18px;
+  color: #FFFFFF;
+  line-height: 100%;
+}
+
+.banner--base {
+  height: 42px;
+  background-color: #78439F;
+  color: #FFFFFF;
+  padding: 0.75rem;
+  font-family: ProximaNovaSoft-Medium;
+  font-size: 14px;
+}
+
+/* order styles */
+.order--container {
+  max-width: 300px;
+  margin: 4rem auto;
+}
+
+@media screen and (min-width: 500px) {
+  .collapsible {
+    display: flex;
+    margin: 0 auto;
+  }
+
+  .collapsible .nav--list {
+    display: flex;
+  }
+
+  .mobile--brand {
+    display: none;
+  }
+
+  .mobile--nav {
+    display: none;
+  }
+
+  .deskt--brand {
+    display: block;
+    font-size: 20px;
+  }
+
+  .account--management {
+    display: flex;
+  }
 }
