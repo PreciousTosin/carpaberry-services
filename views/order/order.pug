@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  .order--container
+    form(action='/order', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label.col-form-label(for='email') Email
+        input.form-control(type='text', name='email', id='email', value=user.email)
+      .form-group
+        label.col-form-label(for='regWear') Regular Clothing
+        input.form-control(type='text', name='regularWear', id='regWear' value='15')
+      .form-group
+        label.col-form-label(for='undWear') Underwears
+        input.form-control(type='text', name='underWear', id='undWear', value='5')
+      .form-group
+        label.col-form-label(for='lagItems') Large Items
+        input.form-control(type='text', name='largeItems', id='lagItems', value='3')
+      .form-group
+        input(class='btn btn-dark', type='submit', value='Make Order')
