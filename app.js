@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies,max-len,global-require */
 /**
  * Module dependencies.
  */
@@ -30,7 +30,7 @@ const compiler = webpack(webpackConfig);
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.load({ path: '.env.example' });
+dotenv.load({ path: '.env' });
 
 /**
  * Controllers (route handlers).
@@ -39,6 +39,7 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
+const orderController = require('./controllers/order');
 
 /**
  * API keys and Passport configuration.
@@ -87,10 +88,13 @@ app.use(session({
     autoReconnect: true,
   })
 }));
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: true, publicPath: webpackConfig.output.publicPath
-}));
-app.use(require('webpack-hot-middleware')(compiler));
+
+if (process.env.NODE_ENV === 'DEVELOPMENT') {
+  app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true, publicPath: webpackConfig.output.publicPath
+  }));
+  app.use(require('webpack-hot-middleware')(compiler));
+}
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -121,10 +125,9 @@ app.use((req, res, next) => {
   next();
 });
 app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
-app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+if (process.env.NODE_ENV === 'PRODUCTION') {
+  app.use('/', express.static(path.join(__dirname, 'build'), { maxAge: 31557600000 }));
+}
 
 /**
  * Primary app routes.
@@ -146,6 +149,9 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+app.get('/order', passportConfig.isAuthenticated, orderController.getOrder);
+app.post('/order', passportConfig.isAuthenticated, orderController.postOrder);
+app.get('/summary', passportConfig.isAuthenticated, orderController.getSummary);
 
 /**
  * API examples routes.
@@ -231,7 +237,7 @@ app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRed
 /**
  * Error Handler.
  */
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'DEVELOPMENT') {
   // only use in development
   app.use(errorHandler());
 }
