@@ -23,7 +23,11 @@ const userSchema = new mongoose.Schema({
     location: String,
     website: String,
     picture: String
-  }
+  },
+  orders: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order',
+  }],
 }, { timestamps: true });
 
 /**
