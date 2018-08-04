@@ -54,7 +54,23 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+mongoose.promise = global.Promise;
+switch (process.env.NODE_ENV) {
+  case 'DEVELOPMENT':
+    console.log('development');
+    mongoose.connect(process.env.mongoDBDev, {
+      useNewUrlParser: true,
+    });
+    break;
+  case 'PRODUCTION':
+    console.log('production');
+    mongoose.connect(process.env.mongoDBProd, {
+      useNewUrlParser: true,
+    });
+    break;
+  default:
+    throw new Error(`Unknown execution environment: ${process.env.ENV}`);
+}
 mongoose.connection.on('error', (err) => {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
@@ -84,7 +100,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
   store: new MongoStore({
-    url: process.env.MONGODB_URI,
+    url: process.env.NODE_ENV === 'DEVELOPMENT' ? process.env.mongoDBDev : process.env.mongoDBProd,
     autoReconnect: true,
   })
 }));
