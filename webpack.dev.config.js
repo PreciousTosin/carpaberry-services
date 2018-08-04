@@ -78,7 +78,7 @@ module.exports = {
       // loader for images, fonts, file
       {
         /* test: /\.(jpe?g|png|gif|svg|ttf|eot|woff(2)?)$/, */
-        test: /\.(jpe|jpg|png|gif|woff|woff2|eot|ttf|svg)(\?.*$|$)/,
+        test: /\.(jpe|jpg|png|gif|woff|woff2|eot|ttf|otf|svg)(\?.*$|$)/,
         use: [
           {
             loader: 'url-loader',
