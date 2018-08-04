@@ -9,9 +9,9 @@
   "author": "Tosin Akinbobola",
   "license": "MIT",
   "scripts": {
-    "postinstall": "npm rebuild node-sass",
     "start": "node app.js",
-    "production": "webpack --config ./webpack.prod.config.js --progress",
+    "production": "node_modules/.bin/rimraf build && webpack --config ./webpack.prod.config.js --progress",
+    "postinstall": "node_modules/.bin/rimraf build && webpack --config ./webpack.prod.config.js --progress",
     "test": "nyc mocha --timeout=3000 --exit",
     "lint": "eslint **/*.js"
   },
@@ -63,6 +63,7 @@
     "pug": "^2.0.3",
     "ravepay": "0.0.4",
     "request": "^2.87.0",
+    "rimraf": "^2.6.2",
     "stripe": "^6.1.1",
     "tumblr.js": "^2.0.0",
     "twilio": "^3.17.5",
