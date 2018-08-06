@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const { promisify } = require('util');
 const request = require('request');
 const cheerio = require('cheerio');
@@ -8,13 +7,13 @@ const tumblr = require('tumblr.js');
 const GitHub = require('@octokit/rest');
 const Twit = require('twit');
 const stripe = require('stripe')(process.env.STRIPE_SKEY);
-// const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
-// const Linkedin = require('node-linkedin')(process.env.LINKEDIN_ID, process.env.LINKEDIN_SECRET, process.env.LINKEDIN_CALLBACK_URL);
-// const clockwork = require('clockwork')({ key: process.env.CLOCKWORK_KEY });
+const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+const Linkedin = require('node-linkedin')(process.env.LINKEDIN_ID, process.env.LINKEDIN_SECRET, process.env.LINKEDIN_CALLBACK_URL);
+const clockwork = require('clockwork')({ key: process.env.CLOCKWORK_KEY });
 const paypal = require('paypal-rest-sdk');
-// const lob = require('lob')(process.env.LOB_KEY);
+const lob = require('lob')(process.env.LOB_KEY);
 const ig = require('instagram-node').instagram();
-/* const { Venues, Users } = require('node-foursquare')({
+const { Venues, Users } = require('node-foursquare')({
   secrets: {
     clientId: process.env.FOURSQUARE_ID,
     clientSecret: process.env.FOURSQUARE_SECRET,
@@ -24,7 +23,7 @@ const ig = require('instagram-node').instagram();
     mode: 'foursquare',
     version: 20140806,
   }
-}); */
+});
 
 /**
  * GET /api
@@ -41,9 +40,9 @@ exports.getApi = (req, res) => {
  * Foursquare API example.
  */
 exports.getFoursquare = async (req, res, next) => {
-  // const token = req.user.tokens.find(token => token.kind === 'foursquare');
+  const token = req.user.tokens.find(token => token.kind === 'foursquare');
   try {
-    /* const getTrendingAsync = promisify(Venues.getTrending);
+    const getTrendingAsync = promisify(Venues.getTrending);
     const getVenueAsync = promisify(Venues.getVenue);
     const getCheckinsAsync = promisify(Users.getCheckins);
     const trendingVenues = await getTrendingAsync('40.7222756', '-74.0022724', { limit: 50 }, token.accessToken);
@@ -54,7 +53,7 @@ exports.getFoursquare = async (req, res, next) => {
       trendingVenues,
       venueDetail,
       userCheckins
-    }); */
+    });
   } catch (err) {
     return next(err);
   }
@@ -396,14 +395,13 @@ exports.getTwilio = (req, res) => {
  * POST /api/twilio
  * Send a text message using Twilio.
  */
-// eslint-disable-next-line no-unused-vars
 exports.postTwilio = (req, res, next) => {
   req.assert('number', 'Phone number is required.').notEmpty();
   req.assert('message', 'Message cannot be blank.').notEmpty();
 
-  // const errors = req.validationErrors();
+  const errors = req.validationErrors();
 
-  /* if (errors) {
+  if (errors) {
     req.flash('errors', errors);
     return res.redirect('/api/twilio');
   }
@@ -416,7 +414,7 @@ exports.postTwilio = (req, res, next) => {
   twilio.messages.create(message).then((sentMessage) => {
     req.flash('success', { msg: `Text send to ${sentMessage.to}` });
     res.redirect('/api/twilio');
-  }).catch(next); */
+  }).catch(next);
 };
 
 /**
@@ -433,9 +431,8 @@ exports.getClockwork = (req, res) => {
  * POST /api/clockwork
  * Send a text message using Clockwork SMS
  */
-// eslint-disable-next-line no-unused-vars
 exports.postClockwork = (req, res, next) => {
-  /* const message = {
+  const message = {
     To: req.body.telephone,
     From: 'Hackathon',
     Content: 'Hello from the Hackathon Starter'
@@ -444,16 +441,15 @@ exports.postClockwork = (req, res, next) => {
     if (err) { return next(err.errDesc); }
     req.flash('success', { msg: `Text sent to ${responseData.responses[0].to}` });
     res.redirect('/api/clockwork');
-  }); */
+  });
 };
 
 /**
  * GET /api/linkedin
  * LinkedIn API example.
  */
-// eslint-disable-next-line no-unused-vars
 exports.getLinkedin = (req, res, next) => {
-  /* const token = req.user.tokens.find(token => token.kind === 'linkedin');
+  const token = req.user.tokens.find(token => token.kind === 'linkedin');
   const linkedin = Linkedin.init(token.accessToken);
   linkedin.people.me((err, $in) => {
     if (err) { return next(err); }
@@ -461,7 +457,7 @@ exports.getLinkedin = (req, res, next) => {
       title: 'LinkedIn API',
       profile: $in
     });
-  }); */
+  });
 };
 
 /**
@@ -564,15 +560,14 @@ exports.getPayPalCancel = (req, res) => {
  * GET /api/lob
  * Lob API example.
  */
-// eslint-disable-next-line no-unused-vars
 exports.getLob = (req, res, next) => {
-  /* lob.usZipLookups.lookup({ zip_code: '94107' }, (err, zipdetails) => {
+  lob.usZipLookups.lookup({ zip_code: '94107' }, (err, zipdetails) => {
     if (err) { return next(err); }
     res.render('api/lob', {
       title: 'Lob API',
       zipdetails,
     });
-  }); */
+  });
 };
 
 /**
