@@ -22,10 +22,6 @@ const sass = require('node-sass-middleware');
 const multer = require('multer');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
-const webpack = require('webpack');
-const webpackConfig = require('./webpack.dev.config');
-
-const compiler = webpack(webpackConfig);
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -106,6 +102,11 @@ app.use(session({
 }));
 
 if (process.env.NODE_ENV === 'development') {
+  const webpack = require('webpack');
+  const webpackConfig = require('./webpack.dev.config');
+
+  const compiler = webpack(webpackConfig);
+
   app.use(require('webpack-dev-middleware')(compiler, {
     noInfo: true, publicPath: webpackConfig.output.publicPath
   }));
