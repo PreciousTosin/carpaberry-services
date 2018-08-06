@@ -56,13 +56,13 @@ const app = express();
  */
 mongoose.promise = global.Promise;
 switch (process.env.NODE_ENV) {
-  case 'DEVELOPMENT':
+  case 'development':
     console.log('development');
     mongoose.connect(process.env.mongoDBDev, {
       useNewUrlParser: true,
     });
     break;
-  case 'PRODUCTION':
+  case 'production':
     console.log('production');
     mongoose.connect(process.env.mongoDBProd, {
       useNewUrlParser: true,
@@ -100,12 +100,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
   store: new MongoStore({
-    url: process.env.NODE_ENV === 'DEVELOPMENT' ? process.env.mongoDBDev : process.env.mongoDBProd,
+    url: process.env.NODE_ENV === 'development' ? process.env.mongoDBDev : process.env.mongoDBProd,
     autoReconnect: true,
   })
 }));
 
-if (process.env.NODE_ENV === 'DEVELOPMENT') {
+if (process.env.NODE_ENV === 'development') {
   app.use(require('webpack-dev-middleware')(compiler, {
     noInfo: true, publicPath: webpackConfig.output.publicPath
   }));
@@ -141,7 +141,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-if (process.env.NODE_ENV === 'PRODUCTION') {
+if (process.env.NODE_ENV === 'production') {
   app.use('/', express.static(path.join(__dirname, 'build'), { maxAge: 31557600000 }));
 }
 
@@ -253,7 +253,7 @@ app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRed
 /**
  * Error Handler.
  */
-if (process.env.NODE_ENV === 'DEVELOPMENT') {
+if (process.env.NODE_ENV === 'development') {
   // only use in development
   app.use(errorHandler());
 }
