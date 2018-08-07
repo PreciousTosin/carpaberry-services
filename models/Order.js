@@ -13,11 +13,11 @@ function sumObjValues(obj) {
 
 const orderSchema = new mongoose.Schema({
   regularWear: Number,
-  underwear: Number,
+  underWear: Number,
   largeItems: Number,
   cost: {
     regularWear: Number,
-    underwear: Number,
+    underWear: Number,
     largeItems: Number,
     totalCost: Number,
   },
