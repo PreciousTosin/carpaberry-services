@@ -362,6 +362,17 @@ textarea {
   margin: 4rem auto;
 }
 
+/* summary container */
+.summary--container {
+  width: 300px;
+  margin: 2rem auto;
+}
+
+.summary--header {
+  padding: 1.5rem 0;
+  font-size: 1.2rem;
+}
+
 @media screen and (min-width: 500px) {
   .collapsible {
     display: flex;
@@ -387,5 +398,10 @@ textarea {
 
   .account--management {
     display: flex;
+  }
+
+  .summary--container {
+    width: 500px;
+    margin: 4rem auto;
   }
 }
