@@ -1,5 +1,6 @@
 const Ravepay = require('ravepay');
 const Promise = require('bluebird');
+const request = require('request-promise');
 
 const rave = new Ravepay(process.env.RAVE_PUBLICK_KEY, process.env.RAVE_SECRET_KEY, false);
 
@@ -37,18 +38,63 @@ const payload3 = {
   device_fingerprint: '69e6b7f0b72037aa8428b70fbe03986c'
 };
 
-exports.chargeAccount = () => {
-  return new Promise((resolve, reject) => {
-    rave.Account.charge(payload3).then(resp => resolve(resp.body))
-      .catch((err) => {
-        // Handle error
-        console.log(err);
-        reject(err);
-      });
-  });
+/**
+ * RaveResponse:{ status: 'success',
+  message: 'Hosted Link',
+  data:
+   { link: 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/hosted_pay/ba88204875dc583d93b6' } }
+ */
+
+exports.callRaveApi = (req, res) => {
+  const query = {
+    method: 'POST',
+    uri: 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/hosted/pay',
+    qs: {
+      txref: 'MC-1520443531487',
+      PBFPubKey: process.env.RAVE_PUBLICK_KEY, // -> uri + '?access_token=xxxxx%20xxxxx'
+      customer_email: 'precioustosin@hotmail.com',
+      amount: 1000,
+      currency: 'NGN',
+      redirect_url: `${process.env.BASE_URL}/api/rave/pay-processing`,
+    },
+    headers: {
+      'User-Agent': 'Request-Promise'
+    },
+    json: true
+  };
+
+  request(query)
+    .then((response) => {
+      if (response.status === 'success') {
+        const { link } = response.data;
+        return link;
+      }
+    })
+    .then((link) => {
+      // console.log('Payment Link: ', link);
+      res.redirect(303, link);
+    })
+    .catch((err) => {
+      // API call failed...
+      console.log('Rave Error: ', err);
+    });
 };
 
-exports.chargeCard = () => {
+exports.postRavePayment = (req, res) => {
+  res.json(req.query);
+};
+
+exports.chargeAccount = () => new Promise((resolve, reject) => {
+  rave.Account.charge(payload3).then(resp => resolve(resp.body))
+    .catch((err) => {
+      // Handle error
+      console.log(err);
+      reject(err);
+    });
+});
+
+// eslint-disable-next-line no-unused-vars
+function chargeCard() {
   return new Promise((resolve, reject) => {
     Promise.all([
       rave.Card.charge(payload).then((resp) => {
@@ -81,7 +127,15 @@ exports.chargeCard = () => {
         .catch(err => reject(err));
     });
   });
-};
+}
+
+/* exports.callRaveApi = (req, res) => {
+  chargeCard().then((err, response) => {
+    if (err) console.log(err);
+    console.log(response);
+    res.send({ data: 'Rave Call Made' });
+  });
+}; */
 
 /* module.exports = function chargeCard() {
   return new Promise((resolve, reject) => {
