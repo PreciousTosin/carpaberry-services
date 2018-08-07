@@ -1,24 +1,50 @@
 extends ../layout
 
 block content
-  .order--container
-    .header.text-center Review any changes necessary
-    form(action='/order', method='POST')
+  .summary--container
+    .summary--header.text-center Review any changes necessary
+    form(action='/order-summary', method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
-      .form-group
+      .form-group.d-none
         label.col-form-label(for='email') Email
         input.form-control(type='text', name='email', id='email', value=user.email)
-      .form-group
-        label.col-form-label(for='regWear') Regular Clothing
-        input.form-control(type='text', name='regularWear', id='regWear' value='15')
-      .form-group
-        label.col-form-label(for='undWear') Underwears
-        input.form-control(type='text', name='underWear', id='undWear', value='5')
-      .form-group
-        label.col-form-label(for='lagItems') Large Items
-        input.form-control(type='text', name='largeItems', id='lagItems', value='3')
-      .form-group
-        label.col-form-label(for='lagItems') Large Items
-        input.form-control(type='text', name='largeItems', id='lagItemsCost', value='#{data.cost.largeItems}')
-      .form-group
-        input(class='btn btn-dark', type='submit', value='Submit')
+      .form-group.d-none
+        label.col-form-label(for='orderId') Order ID
+        input.form-control(type='text', name='orderId', id='orderId' value= data._id)
+      .row
+        .col-md-4
+          .form-group
+            label.col-form-label(for='regWear') Regular Clothing
+        .col-6.col-md-4
+          .form-group.cloth--qty
+            input.form-control(type='text', name='regularWear', id='regWear' value= data.regularWear)
+        .col-6.col-md-4
+          .form-group
+            input.form-control(type='text', name='regularWearCost', id='regWearCost', readonly, value= data.cost.regularWear)
+      .row
+        .col-md-4
+          label.col-form-label(for='undWear') Underwears
+        .col-6.col-md-4
+          .form-group.cloth--qty
+            input.form-control(type='text', name='underWear', id='undWear', value= data.underWear)
+        .col-6.col-md-4
+          .form-group
+            input.form-control(type='text', name='underWearCost', id='undWearCost', readonly, value= data.cost.underWear)
+      .row
+        .col-md-4
+          label.col-form-label(for='lagItems') Large Items
+        .col-6.col-md-4
+          .form-group.cloth--qty
+            input.form-control(type='text', name='largeItems', id='lagItems', value= data.largeItems)
+        .col-6.col-md-4
+          .form-group
+            input.form-control(type='text', name='largeItemsCost', id='lagItemsCost', readonly, value= data.cost.largeItems)
+      .row
+        .col-6.col-md-4
+          label.col-form-label(for='totalCost') Total
+        .col-6.col-md-4.offset-md-4
+          .form-group
+            input.form-control(type='text', name='totalCost', id='totalCost', readonly, value= data.cost.totalCost)
+
+      .form-group.text-right
+        input(class='btn btn-dark', type='submit', value='Checkout')
