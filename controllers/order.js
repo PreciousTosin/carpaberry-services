@@ -1,36 +1,23 @@
 const { Order } = require('../models/Order');
 const User = require('../models/User');
-const raveApi = require('./raveapi');
 
 exports.getOrder = (req, res) => {
   /* if (req.user) {
     return res.redirect('/');
   } */
-  /* raveApi.chargeCard().then((err, response) => {
-    if (err) console.log(err);
-    console.log(response);
-    res.render('order/order', {
-      title: 'Order'
-    });
-  }); */
-  raveApi.chargeAccount().then((err, response) => {
-    if (err) console.log(err);
-    console.log(response);
-    res.render('order/order', {
-      title: 'Order'
-    });
-  });
-  /* res.render('order/order', {
+  res.render('order/order', {
     title: 'Order'
-  }); */
+  });
 };
 
 exports.getSummary = (req, res) => {
   /* if (req.user) {
     return res.redirect('/');
   } */
-  const { orderId } = req.query;
-  Order.findOne({ id: orderId }, (err, order) => {
+  // const { orderId } = req.query;
+  const orderId = '5b68e51735e65f24ee8a10f5';
+  Order.findOne({ _id: orderId }, (err, order) => {
+    if (err) console.log(err);
     res.render('order/order-summary', {
       title: 'Order-Summary',
       data: order,
@@ -38,23 +25,60 @@ exports.getSummary = (req, res) => {
   });
 };
 
+exports.postSummary = (req, res) => {
+  /* if (req.user) {
+    return res.redirect('/');
+  } */
+  const {
+    _id, regularWear, underWear, largeItems
+  } = req.body;
+  console.log(_id);
+  Order.findOne({ _id }, (err, order) => {
+    console.log('Order Sent', order);
+    /* res.render('order/order-summary', {
+      title: 'Order-Summary',
+      data: order,
+    }); */
+  });
+};
+
+exports.getTestOrders = (req, res) => {
+  const id = '5b68e51735e65f24ee8a10f5';
+  Order.findOne({ _id: id }, (err, order) => {
+    if (err) console.log(err);
+    console.log('Order Sent', order);
+    const { _id, ...others } = order;
+    res.json({
+      ID: _id,
+      data: others,
+    });
+  });
+};
+
+// eslint-disable-next-line no-unused-vars
 function calcCost(payload) {
   const regularWear = payload.regularWear * 40;
-  const underwear = payload.underWear * 20;
+  const underWear = payload.underWear * 20;
   const largeItems = payload.largeItems * 100;
-  const totalCost = regularWear + underwear + largeItems;
-  return { regularWear, underwear, totalCost };
+  const totalCost = regularWear + underWear + largeItems;
+  return {
+    regularWear,
+    underWear,
+    largeItems,
+    totalCost
+  };
 }
 
 exports.postOrder = (req, res, next) => {
-  const total = calcCost(req.body);
+  res.redirect(303, '/summary');
+  /* const total = calcCost(req.body);
   Order.create({
     regularWear: req.body.regularWear,
-    underwear: req.body.underWear,
+    underWear: req.body.underWear,
     largeItems: req.body.largeItems,
     cost: {
       regularWear: total.regularWear,
-      underwear: total.underWear,
+      underWear: total.underWear,
       largeItems: total.largeItems,
       totalCost: total.totalCost,
     },
@@ -69,15 +93,17 @@ exports.postOrder = (req, res, next) => {
           else {
             console.log(data);
             console.log(order._id);
-            chargeCard().then((err, response) => {
+            const redirectUrl = `/summary/?orderId=${order._id}`;
+            res.redirect(303, redirectUrl);
+            /!* chargeCard().then((err, response) => {
               const ID = order._id;
               const redirectUrl = `/summary/?orderId=${ID}`;
               res.redirect(303, redirectUrl);
               console.log(response);
-            });
+            }); *!/
           }
         });
       }
     });
-  });
+  }); */
 };
