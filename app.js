@@ -118,7 +118,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload') {
+  if (req.path === '/api/upload' || '/api/rave/pay-processing') {
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -206,7 +206,8 @@ app.get('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAutho
 app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
 app.get('/api/google-maps', apiController.getGoogleMaps);
 app.get('/api/rave', raveApiController.callRaveApi);
-app.get('/api/rave/pay-processing', raveApiController.postRavePayment);
+app.post('/api/rave', raveApiController.sendRaveTransaction);
+app.post('/api/rave/pay-processing', raveApiController.verifyRavePayment);
 
 /**
  * OAuth authentication routes. (Sign in)
