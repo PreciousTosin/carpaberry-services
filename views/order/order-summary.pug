@@ -3,7 +3,7 @@ extends ../layout
 block content
   .summary--container
     .summary--header.text-center Review any changes necessary
-    form(action='/order-summary', method='POST')
+    form(action='/api/rave', method='POST')
       input(type='hidden', name='_csrf', value=_csrf)
       .form-group.d-none
         label.col-form-label(for='email') Email
@@ -11,6 +11,9 @@ block content
       .form-group.d-none
         label.col-form-label(for='orderId') Order ID
         input.form-control(type='text', name='orderId', id='orderId' value= data._id)
+      .form-group
+        label.col-form-label(for='phone') Mobile
+        input.form-control(type='text', name='phone', id='phone', value='+2348122637253')
       .row
         .col-md-4
           .form-group
