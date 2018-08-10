@@ -1,4 +1,5 @@
-const { Order } = require('../models/Order');
+const request = require('request-promise');
+const Order = require('../models/Order');
 const User = require('../models/User');
 
 exports.getOrder = (req, res) => {
@@ -14,8 +15,8 @@ exports.getSummary = (req, res) => {
   /* if (req.user) {
     return res.redirect('/');
   } */
-  // const { orderId } = req.query;
-  const orderId = '5b68e51735e65f24ee8a10f5';
+  const { orderId } = req.query;
+  // const orderId = '5b68e51735e65f24ee8a10f5';
   Order.findOne({ _id: orderId }, (err, order) => {
     if (err) console.log(err);
     res.render('order/order-summary', {
@@ -30,15 +31,39 @@ exports.postSummary = (req, res) => {
     return res.redirect('/');
   } */
   const {
-    _id, regularWear, underWear, largeItems
+    _id,
+    regularWear,
+    underWear,
+    largeItems,
+    regularWearCost,
+    underWearCost,
+    largeItemsCost,
+    totalCost
   } = req.body;
   console.log(_id);
   Order.findOne({ _id }, (err, order) => {
+    order.regularWear = regularWear;
+    order.underWear = underWear;
+    order.largeItems = largeItems;
+    order.cost.regularWear = regularWearCost;
+    order.cost.underWear = underWearCost;
+    order.cost.largeItems = largeItemsCost;
+    order.cost.totalCost = totalCost;
+    order.cost.orderStatus = 'posted';
     console.log('Order Sent', order);
-    /* res.render('order/order-summary', {
-      title: 'Order-Summary',
-      data: order,
-    }); */
+    const query = {
+      method: 'post',
+      url: '/api/rave',
+      body: {
+        email: req.body.email,
+        customerPhone: req.body.phone,
+        orderId: _id,
+        totalCost,
+      }
+    };
+    request(query).then((response) => {
+      console.log(response);
+    }).catch(err => console.log(err));
   });
 };
 
@@ -70,8 +95,8 @@ function calcCost(payload) {
 }
 
 exports.postOrder = (req, res, next) => {
-  res.redirect(303, '/summary');
-  /* const total = calcCost(req.body);
+  // res.redirect(303, '/summary');
+  const total = calcCost(req.body);
   Order.create({
     regularWear: req.body.regularWear,
     underWear: req.body.underWear,
@@ -82,7 +107,7 @@ exports.postOrder = (req, res, next) => {
       largeItems: total.largeItems,
       totalCost: total.totalCost,
     },
-    paymentStatus: 0,
+    paymentStatus: false,
   }, (err, order) => {
     User.findOne({ email: req.body.email }, (err, existingUser) => {
       if (err) { return next(err); }
@@ -95,15 +120,9 @@ exports.postOrder = (req, res, next) => {
             console.log(order._id);
             const redirectUrl = `/summary/?orderId=${order._id}`;
             res.redirect(303, redirectUrl);
-            /!* chargeCard().then((err, response) => {
-              const ID = order._id;
-              const redirectUrl = `/summary/?orderId=${ID}`;
-              res.redirect(303, redirectUrl);
-              console.log(response);
-            }); *!/
           }
         });
       }
     });
-  }); */
+  });
 };
