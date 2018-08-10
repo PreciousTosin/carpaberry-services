@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { transactionSchema } = require('./Transaction');
 
 function sumObjValues(obj) {
   let sum = 0;
@@ -21,8 +20,9 @@ const orderSchema = new mongoose.Schema({
     largeItems: Number,
     totalCost: Number,
   },
-  paymentStatus: Number,
-  transactionInfo: transactionSchema,
+  paymentStatus: Boolean,
+  transactionRef: { type: String, unique: true },
+  orderStatus: String,
 }, { timestamps: true });
 
 orderSchema.methods.getCost = function cost() {
@@ -44,4 +44,4 @@ orderSchema.methods.getTotalCost = function totalCost() {
 };
 
 const Order = mongoose.model('Order', orderSchema);
-module.exports = { orderSchema, Order };
+module.exports = Order;
