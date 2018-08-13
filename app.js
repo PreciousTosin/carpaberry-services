@@ -37,6 +37,7 @@ const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const orderController = require('./controllers/order');
 const raveApiController = require('./controllers/raveapi');
+const transactionController = require('./controllers/transaction');
 
 /**
  * API keys and Passport configuration.
@@ -172,6 +173,7 @@ app.get('/order/test', orderController.getTestOrders);
 app.post('/order', passportConfig.isAuthenticated, orderController.postOrder);
 app.get('/summary', passportConfig.isAuthenticated, orderController.getSummary);
 app.post('/summary', passportConfig.isAuthenticated, orderController.postSummary);
+app.post('/verify-payment', passportConfig.isAuthenticated, transactionController.verifyTransaction);
 
 /**
  * API examples routes.
@@ -206,8 +208,8 @@ app.get('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAutho
 app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
 app.get('/api/google-maps', apiController.getGoogleMaps);
 app.get('/api/rave', raveApiController.callRaveApi);
-app.post('/api/rave', raveApiController.sendRaveTransaction);
-app.post('/api/rave/pay-processing', raveApiController.verifyRavePayment);
+app.post('/api/rave', raveApiController.sendTestRaveTransaction);
+app.post('/api/rave/pay-processing', raveApiController.verifyTestRavePayment);
 
 /**
  * OAuth authentication routes. (Sign in)
