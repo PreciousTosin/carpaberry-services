@@ -1,6 +1,6 @@
-const request = require('request-promise');
 const Order = require('../models/Order');
 const User = require('../models/User');
+const { sendRaveTransaction } = require('./raveapi');
 
 exports.getOrder = (req, res) => {
   /* if (req.user) {
@@ -30,8 +30,12 @@ exports.postSummary = (req, res) => {
   /* if (req.user) {
     return res.redirect('/');
   } */
+  const txRef = 'MC-1520443531495';
   const {
-    _id,
+    orderId,
+    email,
+    phone,
+    paymentMethod,
     regularWear,
     underWear,
     largeItems,
@@ -40,8 +44,8 @@ exports.postSummary = (req, res) => {
     largeItemsCost,
     totalCost
   } = req.body;
-  console.log(_id);
-  Order.findOne({ _id }, (err, order) => {
+  console.log(orderId);
+  Order.findOne({ _id: orderId }, (err, order) => {
     order.regularWear = regularWear;
     order.underWear = underWear;
     order.largeItems = largeItems;
@@ -49,21 +53,24 @@ exports.postSummary = (req, res) => {
     order.cost.underWear = underWearCost;
     order.cost.largeItems = largeItemsCost;
     order.cost.totalCost = totalCost;
+    order.transactionRef = txRef;
     order.cost.orderStatus = 'posted';
-    console.log('Order Sent', order);
-    const query = {
-      method: 'post',
-      url: '/api/rave',
-      body: {
-        email: req.body.email,
-        customerPhone: req.body.phone,
-        orderId: _id,
-        totalCost,
+    order.save((err) => {
+      if (!err) {
+        console.log('Order Sent', order);
+        const payload = {
+          txRef,
+          email,
+          phone,
+          paymentMethod,
+          totalCost,
+        };
+        sendRaveTransaction(payload)
+          .then(link => res.redirect(303, link))
+          .catch(err => console.log(err));
       }
-    };
-    request(query).then((response) => {
-      console.log(response);
-    }).catch(err => console.log(err));
+      console.log(err);
+    });
   });
 };
 

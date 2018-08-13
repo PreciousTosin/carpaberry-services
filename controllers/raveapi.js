@@ -1,8 +1,6 @@
 const Ravepay = require('ravepay');
 const Promise = require('bluebird');
 const request = require('request-promise');
-const Order = require('../models/Order');
-const Transaction = require('../models/Transaction');
 
 /**
  * RaveResponse:{ status: 'success',
@@ -51,8 +49,97 @@ exports.callRaveApi = (req, res) => {
 * transaction reference in order document
 */
 
-exports.sendRaveTransaction = (req, res) => {
-  const txref = 'MC-1520443531492';
+exports.sendRaveTransaction = payload =>
+  // const txref = 'MC-1520443531494';
+  new Promise((resolve, reject) => {
+    const query = {
+      method: 'POST',
+      uri: 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/hosted/pay',
+      body: {
+        txref: payload.txRef,
+        PBFPubKey: process.env.RAVE_PUBLICK_KEY, // -> uri + '?access_token=xxxxx%20xxxxx'
+        customer_email: payload.email,
+        customer_phone: payload.phone,
+        amount: payload.totalCost,
+        payment_method: payload.paymentMethod,
+        currency: 'NGN',
+        redirect_url: `${process.env.BASE_URL}/verify-payment`,
+      },
+      headers: {
+        'User-Agent': 'Request-Promise'
+      },
+      json: true
+    };
+
+    // send payment request to Rave payment endpoint
+    request(query)
+      .then((response) => {
+        if (response.status === 'success') {
+          const { link } = response.data;
+          return link;
+        }
+      })
+      .then((link) => {
+        console.log('Payment Link: ', link);
+        console.log('Payment Link Type: ', typeof (link));
+        resolve(link);
+        // res.redirect(303, link);
+      })
+      .catch((err) => {
+        // API call failed...
+        console.log('Rave Error: ', err);
+        reject(err);
+      });
+  });
+
+exports.getRaveTransactionStatus = (req, res) => {
+  res.json(req.query);
+};
+
+/**
+ * Handler to verify payment status to Rave hosted api and save
+ * transaction data, modify paymentStatus and OrderStatus
+ * in the order document
+ */
+
+exports.verifyRavePayment = payload =>
+  new Promise((resolve, reject) => {
+    const query = {
+      method: 'POST',
+      uri: 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/xrequery',
+      body: {
+        SECKEY: process.env.RAVE_SECRET_KEY,
+        txref: payload,
+        include_payment_entity: 1,
+      },
+      headers: {
+        'User-Agent': 'Request-Promise'
+      },
+      json: true
+    };
+
+    request(query)
+      .then((response) => {
+        if (response.status === 'success') {
+          const respData = response.data.status ? response.data : response.data[0];
+          if (!respData) {
+            console.log('Error in payment response');
+          } else {
+            resolve(respData);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log('Rave Error', err);
+        reject(err);
+      });
+  });
+
+
+/* TEST CONTROLLERS */
+
+exports.sendTestRaveTransaction = (req, res) => {
+  const txref = 'MC-1520443531494';
   const query = {
     method: 'POST',
     uri: 'https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/hosted/pay',
@@ -62,6 +149,7 @@ exports.sendRaveTransaction = (req, res) => {
       customer_email: req.body.email,
       customer_phone: req.body.customerPhone,
       amount: req.body.totalCost,
+      payment_method: req.body.paymentMethod,
       currency: 'NGN',
       redirect_url: `${process.env.BASE_URL}/api/rave/pay-processing`,
     },
@@ -71,50 +159,25 @@ exports.sendRaveTransaction = (req, res) => {
     json: true
   };
 
-  // Find order to add transaction reference
-  Order.findOne({ _id: req.body.orderId }, (err, order) => {
-    if (err) console.log(err);
-    order.transactionRef = txref;
-    order.save((err) => {
-      if (err) console.log(err);
-      // send payment request to Rave payment endpoint
-      request(query)
-        .then((response) => {
-          if (response.status === 'success') {
-            const { link } = response.data;
-            return link;
-          }
-        })
-        .then((link) => {
-          console.log('Payment Link: ', link);
-          console.log('Payment Link Type: ', typeof (link));
-          res.redirect(303, link);
-        })
-        .catch((err) => {
-          // API call failed...
-          console.log('Rave Error: ', err);
-        });
+  request(query)
+    .then((response) => {
+      if (response.status === 'success') {
+        const { link } = response.data;
+        return link;
+      }
+    })
+    .then((link) => {
+      console.log('Payment Link: ', link);
+      console.log('Payment Link Type: ', typeof (link));
+      res.redirect(303, link);
+    })
+    .catch((err) => {
+      // API call failed...
+      console.log('Rave Error: ', err);
     });
-  });
 };
 
-exports.getRaveTransactionStatus = (req, res) => {
-  res.json(req.query);
-};
-
-/**
-* {
-    "flwref": "FLW-MOCK-e7d5deefbdc65b579199daa17d072403",
-    "txref": "MC-1520443531487"
-    }
-*/
-
-/**
- * Handler to verify payment status to Rave hosted api and save
- * transaction data, modify paymentStatus and OrderStatus
- * in the order document
- */
-exports.verifyRavePayment = (req, res, next) => {
+exports.verifyTestRavePayment = (req, res, next) => {
   const { txref } = req.query;
   const payload = {
     method: 'POST',
@@ -135,39 +198,23 @@ exports.verifyRavePayment = (req, res, next) => {
     .then((response) => {
       if (response.status === 'success') {
         const respData = response.data.status ? response.data : response.data[0];
-        if (response.data.status !== 'successful') {
+        if (!respData) {
           console.log('Error in payment response');
           next();
+        } else {
+          const {
+            txref, paymenttype, chargedamount, custemail, acctcountry
+          } = respData;
+          const transactObj = {
+            txref,
+            paymenttype,
+            chargedamount,
+            custemail,
+            acctcountry,
+          };
+          console.log(transactObj);
+          res.json(response);
         }
-        const {
-          txref, paymenttype, chargedamount, custemail, acctcountry
-        } = respData;
-        const transactObj = {
-          txref,
-          paymenttype,
-          chargedamount,
-          custemail,
-          acctcountry,
-        };
-        console.log(transactObj);
-        // create transaction record
-        Transaction.create({
-          transactionRef: txref,
-          amount: chargedamount,
-          payMethod: paymenttype,
-          currency: acctcountry,
-        }, (err) => {
-          if (err) console.log(err);
-          // find order paid for and update payment status
-          Order.findOne({ transactionRef: txref }, (err, order) => {
-            order.paymentStatus = true;
-            order.orderStatus = 'processing';
-            order.save((err) => {
-              if (err) console.log(err);
-              res.json(response);
-            });
-          });
-        });
       }
     })
     .catch((err) => {
